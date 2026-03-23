@@ -1,13 +1,10 @@
 pipeline {
     agent any
 
-    tools {
-        sonarQube 'SonarScanner'
-    }
-
     environment {
         SONAR_HOST_URL = 'http://host.docker.internal:9000'
         SONAR_TOKEN = credentials('sonar-token')
+        SCANNER_HOME = tool 'SonarScanner'
     }
 
     stages {
@@ -44,11 +41,11 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 sh """
-                sonar-scanner \
+                ${SCANNER_HOME}/bin/sonar-scanner \
                   -Dsonar.projectKey=mini-projet-devops \
                   -Dsonar.sources=. \
-                  -Dsonar.host.url=$SONAR_HOST_URL \
-                  -Dsonar.login=$SONAR_TOKEN
+                  -Dsonar.host.url=${SONAR_HOST_URL} \
+                  -Dsonar.login=${SONAR_TOKEN}
                 """
             }
         }
