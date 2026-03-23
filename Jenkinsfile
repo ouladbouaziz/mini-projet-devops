@@ -5,6 +5,7 @@ pipeline {
         SONAR_HOST_URL = 'http://host.docker.internal:9000'
         SONAR_TOKEN = credentials('sonar-token')
         SCANNER_HOME = tool 'SonarScanner'
+        SLACK_WEBHOOK = credentials('slack-webhook')
     }
 
     stages {
@@ -48,6 +49,23 @@ pipeline {
                   -Dsonar.login=${SONAR_TOKEN}
                 """
             }
+        }
+    }
+
+    post {
+        success {
+            sh """
+            curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"✅ Jenkins Build Success: mini-projet-devops"}' \
+            "$SLACK_WEBHOOK"
+            """
+        }
+        failure {
+            sh """
+            curl -X POST -H 'Content-type: application/json' \
+            --data '{"text":"❌ Jenkins Build Failed: mini-projet-devops"}' \
+            "$SLACK_WEBHOOK"
+            """
         }
     }
 }
