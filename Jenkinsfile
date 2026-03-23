@@ -43,5 +43,18 @@ pipeline {
                 sh 'docker build -t mini-projet-frontend ./frontend'
             }
         }
+        stage('Push Backend Image') {
+            steps {
+                sh 'docker tag mini-projet-backend yassinebouaziz/mini-projet-backend'
+                sh 'docker push yassinebouaziz/mini-projet-backend'
+            }
+        }
+
+        stage('Push Frontend Image') {
+            steps {
+                sh 'docker tag mini-projet-frontend yassinebouaziz/mini-projet-frontend'
+                sh 'docker push yassinebouaziz/mini-projet-frontend'
+            }
+        }
     }
 }
