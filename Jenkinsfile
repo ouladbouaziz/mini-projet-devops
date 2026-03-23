@@ -1,6 +1,15 @@
 pipeline {
     agent any
 
+    tools {
+        sonarQube 'SonarScanner'
+    }
+
+    environment {
+        SONAR_HOST_URL = 'http://host.docker.internal:9000'
+        SONAR_TOKEN = credentials('sonar-token')
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -32,28 +41,15 @@ pipeline {
             }
         }
 
-        stage('Build Backend Docker Image') {
+        stage('SonarQube Analysis') {
             steps {
-                sh 'docker build -t mini-projet-backend ./backend'
-            }
-        }
-
-        stage('Build Frontend Docker Image') {
-            steps {
-                sh 'docker build -t mini-projet-frontend ./frontend'
-            }
-        }
-        stage('Push Backend Image') {
-            steps {
-                sh 'docker tag mini-projet-backend yassinebouaziz/mini-projet-backend'
-                sh 'docker push yassinebouaziz/mini-projet-backend'
-            }
-        }
-
-        stage('Push Frontend Image') {
-            steps {
-                sh 'docker tag mini-projet-frontend yassinebouaziz/mini-projet-frontend'
-                sh 'docker push yassinebouaziz/mini-projet-frontend'
+                sh """
+                sonar-scanner \
+                  -Dsonar.projectKey=mini-projet-devops \
+                  -Dsonar.sources=. \
+                  -Dsonar.host.url=$SONAR_HOST_URL \
+                  -Dsonar.login=$SONAR_TOKEN
+                """
             }
         }
     }
