@@ -31,5 +31,17 @@ pipeline {
                 }
             }
         }
+
+        stage('Build Backend Docker Image') {
+            steps {
+                sh 'docker build -t mini-projet-backend ./backend'
+            }
+        }
+
+        stage('Build Frontend Docker Image') {
+            steps {
+                sh 'docker build -t mini-projet-frontend ./frontend'
+            }
+        }
     }
 }
